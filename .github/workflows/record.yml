@@ -1,0 +1,30 @@
+name: Record YouTube Live
+
+on:
+  schedule:
+    # 01:00 AM WIB (WIB is UTC+7, so 1:00 AM WIB is 18:00 UTC the previous day)
+    - cron: '0 18 * * *'
+  workflow_dispatch: # Allows you to test it manually anytime
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install yt-dlp and ffmpeg
+        run: |
+          sudo apt update
+          sudo apt install -y ffmpeg
+          sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+          sudo chmod a+rx /usr/local/bin/yt-dlp
+
+      - name: Download YouTube Stream
+        run: |
+          mkdir -p output
+          yt-dlp --live-from-start -f "bestvideo+bestaudio/best" -o "output/recording.mp4" "${{ secrets.STREAM_URL }}"
+
+      - name: Upload Recorded Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-stream-recording
+          path: output/recording.mp4
+          retention-days: 7
