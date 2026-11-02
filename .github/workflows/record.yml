@@ -5,6 +5,7 @@ on:
     - cron: '*/15 * * * *'
   workflow_dispatch:
 
+# Prevents multiple runs from running simultaneously and conflicting
 concurrency:
   group: youtube-live-recorder
   cancel-in-progress: false
@@ -52,7 +53,8 @@ jobs:
             --cookies cookies.txt \
             --remote-components ejs:github \
             --live-from-start \
-            --concurrent-fragments 4 \
+            --fragment-retries 10 \
+            --hls-use-mpegts \
             "https://www.youtube.com/watch?v=XMJi8I_9pp4" \
             -o "output/recording_part1.mp4" || true
 
