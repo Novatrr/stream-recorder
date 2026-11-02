@@ -18,10 +18,10 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Deno JS Runtime (Required for yt-dlp PO Token / JS solver)
-        uses: deno-land/setup-deno@v1
+      - name: Install Deno JS Runtime
+        uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
 
       - name: Install FFmpeg & Latest yt-dlp
         run: |
