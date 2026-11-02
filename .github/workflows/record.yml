@@ -1,8 +1,6 @@
 name: Record YouTube Live
 
 on:
-  schedule:
-    - cron: '0 18 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -55,13 +53,13 @@ jobs:
             --live-from-start \
             --fragment-retries 10 \
             --hls-use-mpegts \
-            "https://www.youtube.com/watch?v=XMJi8I_9pp4" \
-            -o "output/recording_part1.mp4" || true
+            "https://www.youtube.com/live/hWZhyEbP580?si=ZzyzTX0DHBJLfb56" \
+            -o "output/recording_part1.%(ext)s" || true
 
       - name: Upload Recording Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: youtube-recording-part1
-          path: output/recording_part1.mp4
+          path: output/
           retention-days: 7
