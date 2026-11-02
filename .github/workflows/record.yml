@@ -37,7 +37,7 @@ jobs:
           timeout 21000 yt-dlp \
             --live-from-start \
             --cookies cookies.txt \
-            "YOUR_STREAM_URL_HERE" \
+            "https://www.youtube.com/live/XMJi8I_9pp4?si=OahOOLWgKhH2dtD5" \
             -o "output/recording_part1.mp4" || true
 
       - name: Upload Recording Artifact
