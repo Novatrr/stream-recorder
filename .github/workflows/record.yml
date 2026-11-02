@@ -18,6 +18,11 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Set up Node.js (for JS challenge solving)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install Dependencies & Latest yt-dlp
         run: |
           sudo apt-get update
@@ -32,7 +37,8 @@ jobs:
         run: |
           timeout 21000 yt-dlp \
             --live-from-start \
-            --extractor-args "youtube:player_client=default,android;formats=missing_pot" \
+            --extractor-args "youtube:player_client=tv_downgraded,android_vr,web" \
+            --concurrent-fragments 4 \
             "https://www.youtube.com/watch?v=XMJi8I_9pp4" \
             -o "output/recording_part1.mp4" || true
 
