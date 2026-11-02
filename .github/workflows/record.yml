@@ -8,34 +8,34 @@ on:
 jobs:
   check-and-record:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Install yt-dlp, ffmpeg, and nodejs
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies & Latest yt-dlp
         run: |
-          sudo apt update
-          sudo apt install -y ffmpeg nodejs
-          sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
-          sudo chmod a+rx /usr/local/bin/yt-dlp
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          pip install --upgrade yt-dlp
 
-      - name: Check if Stream is Live & Record
+      - name: Create Output Directory
+        run: mkdir -p output
+
+      - name: Record YouTube Live Stream
         run: |
-          mkdir -p output
-          CHANNEL_URL="${{ secrets.STREAM_URL }}"
-          
-          STATUS=$(yt-dlp --print live_status "$CHANNEL_URL" 2>/dev/null || echo "not_live")
-          echo "Current Live Status: $STATUS"
+          timeout 21000 yt-dlp --live-from-start --wait-for-video 30 "YOUR_STREAM_URL_HERE" -o "output/recording_part1.mp4" || true
 
-          if [ "$STATUS" = "is_live" ] || [ "$STATUS" = "is_upcoming" ]; then
-            echo "Stream detected! Starting recording..."
-            timeout 21000 yt-dlp --live-from-start --wait-for-video 30 -f "bestvideo+bestaudio/best" -o "output/recording_part1.mp4" "$CHANNEL_URL" || true
-          else
-            echo "No active stream found. Exiting cleanly."
-            exit 0
-          fi
-
-      - name: Upload Recorded Video Artifact
+      - name: Upload Recording Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: live-stream-recording-part1
+          name: youtube-recording-part1
           path: output/recording_part1.mp4
           retention-days: 7
