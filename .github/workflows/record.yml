@@ -1,13 +1,13 @@
-name: Check & Record YouTube Live
+name: Record YouTube Live
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '0 18 * * *'
   workflow_dispatch:
 
 concurrency:
   group: youtube-live-recorder
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   check-and-record:
@@ -51,6 +51,7 @@ jobs:
             --force-ipv4 \
             --cookies cookies.txt \
             --remote-components ejs:github \
+            --wait-for-video 30 \
             --live-from-start \
             --fragment-retries 10 \
             --hls-use-mpegts \
