@@ -46,6 +46,7 @@ jobs:
           timeout 21000 yt-dlp \
             --force-ipv4 \
             --cookies cookies.txt \
+            --remote-components ejs:github \
             --live-from-start \
             --concurrent-fragments 4 \
             "https://www.youtube.com/watch?v=XMJi8I_9pp4" \
