@@ -52,6 +52,8 @@ jobs:
             --wait-for-video 30 \
             --live-from-start \
             --fragment-retries 10 \
+            --abort-on-unavailable-fragment \
+            --socket-timeout 15 \
             --hls-use-mpegts \
             "https://www.youtube.com/live/hWZhyEbP580?si=ZzyzTX0DHBJLfb56" \
             -o "output/recording_part1.%(ext)s" || true
