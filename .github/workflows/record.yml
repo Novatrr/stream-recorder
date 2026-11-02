@@ -18,26 +18,35 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Set up Node.js (for JS challenge solving)
-        uses: actions/setup-node@v4
+      - name: Install Deno JS Runtime (Required for yt-dlp PO Token / JS solver)
+        uses: deno-land/setup-deno@v1
         with:
-          node-version: '20'
+          deno-version: v1.x
 
-      - name: Install Dependencies & Latest yt-dlp
+      - name: Install FFmpeg & Latest yt-dlp
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
           python -m pip install --upgrade pip
           pip install --upgrade --no-cache-dir yt-dlp
 
-      - name: Create Output Directory
-        run: mkdir -p output
+      - name: Create Output Directory & Write Cookies
+        env:
+          YT_COOKIES: ${{ secrets.YT_COOKIES }}
+        run: |
+          mkdir -p output
+          if [ -z "$YT_COOKIES" ]; then
+            echo "::error ::YT_COOKIES secret is missing or empty in GitHub Settings!"
+            exit 1
+          fi
+          echo "$YT_COOKIES" > cookies.txt
 
       - name: Record YouTube Live Stream
         run: |
           timeout 21000 yt-dlp \
+            --force-ipv4 \
+            --cookies cookies.txt \
             --live-from-start \
-            --extractor-args "youtube:player_client=tv_downgraded,android_vr,web" \
             --concurrent-fragments 4 \
             "https://www.youtube.com/watch?v=XMJi8I_9pp4" \
             -o "output/recording_part1.mp4" || true
