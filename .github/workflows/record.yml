@@ -25,17 +25,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade yt-dlp
 
-      - name: Create Output Directory
-        run: mkdir -p output
+      - name: Create Output Directory & Load Cookies
+        env:
+          YT_COOKIES: ${{ secrets.YT_COOKIES }}
+        run: |
+          mkdir -p output
+          echo "$YT_COOKIES" > cookies.txt
 
       - name: Record YouTube Live Stream
         run: |
           timeout 21000 yt-dlp \
             --live-from-start \
-            --wait-for-video 30 \
-            --extractor-args "youtube:player_client=android,web" \
-            --concurrent-fragments 4 \
-            "https://www.youtube.com/live/XMJi8I_9pp4?si=-MEOF5jqlloaHVoT" \
+            --cookies cookies.txt \
+            "YOUR_STREAM_URL_HERE" \
             -o "output/recording_part1.mp4" || true
 
       - name: Upload Recording Artifact
