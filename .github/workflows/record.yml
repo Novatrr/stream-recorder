@@ -5,10 +5,9 @@ on:
     - cron: '*/15 * * * *'
   workflow_dispatch:
 
-# Prevents multiple runs from running simultaneously and conflicting
 concurrency:
   group: youtube-live-recorder
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   check-and-record:
