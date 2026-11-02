@@ -1,0 +1,31 @@
+name: Record YouTube Live (Part 2)
+
+on:
+  schedule:
+    # 06:30 AM WIB (23:30 UTC previous day)
+    - cron: '30 23 * * *'
+  workflow_dispatch: # Allows manual trigger anytime
+
+jobs:
+  record_part2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install yt-dlp, ffmpeg, and nodejs
+        run: |
+          sudo apt update
+          sudo apt install -y ffmpeg nodejs
+          sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+          sudo chmod a+rx /usr/local/bin/yt-dlp
+
+      - name: Download YouTube Stream (Part 2)
+        run: |
+          mkdir -p output
+          timeout 21000 yt-dlp --live-from-start --wait-for-video 60 -f "bestvideo+bestaudio/best" -o "output/recording_part2.mp4" "${{ secrets.STREAM_URL }}" || true
+
+      - name: Upload Recorded Video Artifact (Part 2)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-stream-recording-part2
+          path: output/recording_part2.mp4
+          retention-days: 7
