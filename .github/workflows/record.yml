@@ -18,26 +18,40 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Set up Node.js (for YouTube JS Challenge Solver)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install Dependencies & Latest yt-dlp
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
           python -m pip install --upgrade pip
-          pip install --upgrade yt-dlp
+          pip install --upgrade --no-cache-dir yt-dlp
 
       - name: Create Output Directory & Load Cookies
         env:
           YT_COOKIES: ${{ secrets.YT_COOKIES }}
         run: |
           mkdir -p output
-          echo "$YT_COOKIES" > cookies.txt
+          if [ -n "$YT_COOKIES" ]; then
+            echo "$YT_COOKIES" > cookies.txt
+          fi
 
       - name: Record YouTube Live Stream
         run: |
+          COOKIE_ARG=""
+          if [ -f cookies.txt ]; then
+            COOKIE_ARG="--cookies cookies.txt"
+          fi
+
           timeout 21000 yt-dlp \
             --live-from-start \
-            --cookies cookies.txt \
-            "https://www.youtube.com/live/XMJi8I_9pp4?si=OahOOLWgKhH2dtD5" \
+            $COOKIE_ARG \
+            --extractor-args "youtube:player_client=ios,web_creator" \
+            --format "bv*+ba/b" \
+            "https://www.youtube.com/watch?v=XMJi8I_9pp4" \
             -o "output/recording_part1.mp4" || true
 
       - name: Upload Recording Artifact
