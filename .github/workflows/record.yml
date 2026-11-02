@@ -1,9 +1,9 @@
-name: Record YouTube Live
+name: Record YouTube Live (Part 1)
 
 on:
   schedule:
-    # 01:00 AM WIB (18:00 UTC previous day)
-    - cron: '0 18 * * *'
+    # Triggers at 6:50 AM WIB (23:50 UTC previous day) - 10 mins before 7:00 AM stream
+    - cron: '50 23 * * *'
   workflow_dispatch: # Allows manual trigger anytime
 
 jobs:
@@ -20,44 +20,13 @@ jobs:
       - name: Download YouTube Stream
         run: |
           mkdir -p output
-          # Cap recording at 5h 50m (21000s) to exit cleanly before GitHub's 6h limit
-          timeout 21000 yt-dlp --live-from-start --wait-for-video 60 -f "bestvideo+bestaudio/best" -o "output/recording.mp4" "${{ secrets.STREAM_URL }}" || true
+          # Cap execution at 5h 50m (21000s) to exit cleanly before GitHub's 6h hard limit
+          timeout 21000 yt-dlp --live-from-start --wait-for-video 60 -f "bestvideo+bestaudio/best" -o "output/recording_part1.mp4" "${{ secrets.STREAM_URL }}" || true
 
       - name: Upload Recorded Video Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: live-stream-recording
-          path: output/recording.mp4
-          retention-days: 7name: Record YouTube Live
-
-on:
-  schedule:
-    # 01:00 AM WIB (18:00 UTC previous day)
-    - cron: '0 18 * * *'
-  workflow_dispatch: # Allows manual trigger anytime
-
-jobs:
-  record:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install yt-dlp, ffmpeg, and nodejs
-        run: |
-          sudo apt update
-          sudo apt install -y ffmpeg nodejs
-          sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
-          sudo chmod a+rx /usr/local/bin/yt-dlp
-
-      - name: Download YouTube Stream
-        run: |
-          mkdir -p output
-          # Cap recording at 5h 50m (21000s) to exit cleanly before GitHub's 6h limit
-          timeout 21000 yt-dlp --live-from-start --wait-for-video 60 -f "bestvideo+bestaudio/best" -o "output/recording.mp4" "${{ secrets.STREAM_URL }}" || true
-
-      - name: Upload Recorded Video Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: live-stream-recording
-          path: output/recording.mp4
+          name: live-stream-recording-part1
+          path: output/recording_part1.mp4
           retention-days: 7
