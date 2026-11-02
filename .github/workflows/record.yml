@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Set up Node.js (for YouTube JS Challenge Solver)
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -49,7 +49,6 @@ jobs:
           timeout 21000 yt-dlp \
             --live-from-start \
             $COOKIE_ARG \
-            --extractor-args "youtube:player_client=ios,web_creator" \
             --format "bv*+ba/b" \
             "https://www.youtube.com/watch?v=XMJi8I_9pp4" \
             -o "output/recording_part1.mp4" || true
