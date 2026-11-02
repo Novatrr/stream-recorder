@@ -2,8 +2,8 @@ name: Record YouTube Live (Part 2)
 
 on:
   schedule:
-    # 06:30 AM WIB (23:30 UTC previous day)
-    - cron: '30 23 * * *'
+    # Triggers at 12:20 PM WIB (05:20 UTC) - picks up right as Part 1 finishes
+    - cron: '20 5 * * *'
   workflow_dispatch: # Allows manual trigger anytime
 
 jobs:
@@ -20,6 +20,7 @@ jobs:
       - name: Download YouTube Stream (Part 2)
         run: |
           mkdir -p output
+          # Cap execution at 5h 50m (21000s)
           timeout 21000 yt-dlp --live-from-start --wait-for-video 60 -f "bestvideo+bestaudio/best" -o "output/recording_part2.mp4" "${{ secrets.STREAM_URL }}" || true
 
       - name: Upload Recorded Video Artifact (Part 2)
