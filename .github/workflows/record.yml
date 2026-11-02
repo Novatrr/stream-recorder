@@ -2,7 +2,6 @@ name: Check & Record YouTube Live
 
 on:
   schedule:
-    # Runs automatically every hour on the hour
     - cron: '0 * * * *'
   workflow_dispatch:
 
@@ -20,9 +19,8 @@ jobs:
       - name: Check if Stream is Live & Record
         run: |
           mkdir -p output
-          CHANNEL_URL="https://www.youtube.com/@KaelaKovalskia/live"
+          CHANNEL_URL="${{ secrets.STREAM_URL }}"
           
-          # Check live status using yt-dlp
           STATUS=$(yt-dlp --print live_status "$CHANNEL_URL" 2>/dev/null || echo "not_live")
           echo "Current Live Status: $STATUS"
 
