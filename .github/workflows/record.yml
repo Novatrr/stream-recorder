@@ -18,11 +18,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Install Dependencies & Latest yt-dlp
         run: |
           sudo apt-get update
@@ -30,26 +25,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade --no-cache-dir yt-dlp
 
-      - name: Create Output Directory & Load Cookies
-        env:
-          YT_COOKIES: ${{ secrets.YT_COOKIES }}
-        run: |
-          mkdir -p output
-          if [ -n "$YT_COOKIES" ]; then
-            echo "$YT_COOKIES" > cookies.txt
-          fi
+      - name: Create Output Directory
+        run: mkdir -p output
 
       - name: Record YouTube Live Stream
         run: |
-          COOKIE_ARG=""
-          if [ -f cookies.txt ]; then
-            COOKIE_ARG="--cookies cookies.txt"
-          fi
-
           timeout 21000 yt-dlp \
             --live-from-start \
-            $COOKIE_ARG \
-            --format "bv*+ba/b" \
+            --extractor-args "youtube:player_client=default,android;formats=missing_pot" \
             "https://www.youtube.com/watch?v=XMJi8I_9pp4" \
             -o "output/recording_part1.mp4" || true
 
