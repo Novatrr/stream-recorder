@@ -1,13 +1,13 @@
-name: Record YouTube Live (Part 1)
+name: Check & Record YouTube Live
 
 on:
   schedule:
-    # Triggers at 6:50 AM WIB (23:50 UTC previous day) - 10 mins before 7:00 AM stream
-    - cron: '50 23 * * *'
-  workflow_dispatch: # Allows manual trigger anytime
+    # Runs automatically every hour on the hour
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
-  record:
+  check-and-record:
     runs-on: ubuntu-latest
     steps:
       - name: Install yt-dlp, ffmpeg, and nodejs
@@ -17,11 +17,22 @@ jobs:
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
-      - name: Download YouTube Stream
+      - name: Check if Stream is Live & Record
         run: |
           mkdir -p output
-          # Cap execution at 5h 50m (21000s) to exit cleanly before GitHub's 6h hard limit
-          timeout 21000 yt-dlp --live-from-start --wait-for-video 60 -f "bestvideo+bestaudio/best" -o "output/recording_part1.mp4" "${{ secrets.STREAM_URL }}" || true
+          CHANNEL_URL="https://www.youtube.com/@KaelaKovalskia/live"
+          
+          # Check live status using yt-dlp
+          STATUS=$(yt-dlp --print live_status "$CHANNEL_URL" 2>/dev/null || echo "not_live")
+          echo "Current Live Status: $STATUS"
+
+          if [ "$STATUS" = "is_live" ] || [ "$STATUS" = "is_upcoming" ]; then
+            echo "Stream detected! Starting recording..."
+            timeout 21000 yt-dlp --live-from-start --wait-for-video 30 -f "bestvideo+bestaudio/best" -o "output/recording_part1.mp4" "$CHANNEL_URL" || true
+          else
+            echo "No active stream found. Exiting cleanly."
+            exit 0
+          fi
 
       - name: Upload Recorded Video Artifact
         if: always()
