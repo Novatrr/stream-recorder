@@ -55,7 +55,7 @@ jobs:
             --retry-sleep fragment:exp=1:20 \
             --socket-timeout 30 \
             --hls-use-mpegts \
-            "https://www.youtube.com/live/lUzGRYAD4Yc?si=gthZxrczQ-KtVxH2" \
+            "https://www.youtube.com/live/nUl4wcsH0kg?si=h_53xgJS5vJWi4I3" \
             -o "output/recording_part1.%(ext)s" || true
 
       - name: Upload Recording Artifact
