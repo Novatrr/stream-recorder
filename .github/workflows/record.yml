@@ -51,9 +51,9 @@ jobs:
             --remote-components ejs:github \
             --wait-for-video 30 \
             --live-from-start \
-            --fragment-retries 10 \
-            --abort-on-unavailable-fragment \
-            --socket-timeout 15 \
+            --fragment-retries infinite \
+            --retry-sleep fragment:exp=1:20 \
+            --socket-timeout 30 \
             --hls-use-mpegts \
             "https://www.youtube.com/live/lUzGRYAD4Yc?si=gthZxrczQ-KtVxH2" \
             -o "output/recording_part1.%(ext)s" || true
